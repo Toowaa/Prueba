@@ -1,4 +1,4 @@
-import { Button, image, Image, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
+import { Button, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
 import { useEffect, useState } from "react";
 
 interface Order {

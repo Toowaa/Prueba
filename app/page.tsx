@@ -1,7 +1,6 @@
 "use client";
 import TableMyOrders from "@/components/tableMyorders";
-import { Letras } from "@/components/textfinal";
-import { Textver1 } from "@/components/textver1";
+
 import { Button } from "@heroui/react";
 import Link from "next/link";
 import React from "react";

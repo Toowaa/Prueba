@@ -8,9 +8,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { OrderItem } from "./formulario";
-import { use, useState } from "react";
-import { Router, useRouter } from "next/router";
-import { link } from "fs";
+import {  useState } from "react";
 
 export default function Listar({
   orderItems,
