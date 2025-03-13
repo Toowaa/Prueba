@@ -8,7 +8,9 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { OrderItem } from "./formulario";
-import { useState } from "react";
+import { use, useState } from "react";
+import { Router, useRouter } from "next/router";
+import { link } from "fs";
 
 export default function Listar({
   orderItems,
@@ -71,6 +73,39 @@ export default function Listar({
     }
   };
 
+  const handleSaveOrder = async () => {
+ 
+    const formattedData = {
+      products: orderItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity
+      }))
+    };
+    
+    console.log("Datos formateados:", formattedData);
+    
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formattedData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al guardar la orden');
+      }
+      
+      const result = await response.json();
+      console.log("Resultado de la orden guardada:", result);
+    window.location.href = "/";
+      
+    } catch (error) {
+      console.error("Error:", error);
+   
+    }
+  };
   return (
     <>
       {orderItems.length > 0 && (
@@ -137,7 +172,18 @@ export default function Listar({
               </tr>
             ))}
           </tbody>
+          
+            <Button
+              onPress={handleSaveOrder}
+              color="primary"
+              variant="light"
+             className="text-white rounded-full bg-purple-400 w-full max-w-32 font-normal text-sm"
+            >
+              Save Order
+            </Button>
+          
         </table>
+        
       )}
 
       <Modal isOpen={isOpenDelete} onOpenChange={onOpenChangeDelete}>

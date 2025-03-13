@@ -1,4 +1,5 @@
 import { image, Image } from "@heroui/react";
+import { useEffect, useState } from "react";
 const bloge=[
     {
         idBlog: 1,
@@ -8,7 +9,34 @@ const bloge=[
     }
 ]
 
+interface Order {
+    id: number;
+    OrderNo: number;
+    createdAt: string;
+    FinalPrice: number;
+    Quantity: number;
+}
+ 
+
+
 export default function TableMyOrders() {
+    const [orders, setOrders] = useState<Order[]>([]);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/api/order");
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                const data = await response.json();
+                setOrders(data);
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            }
+        };
+
+        fetchOrders();
+    }, []); 
+
     return (
         <div className="max-h-[500px] overflow-y-auto overflow-scroll:scrollbar-none">
           <table className="w-full border-separate border-spacing-y-4 ">
@@ -24,25 +52,16 @@ export default function TableMyOrders() {
             </thead>
     
             <tbody className="text-center   bg-white text-[#634AE2] font-normal text-[16px] leading-[20px]  ">
-              {bloge.map((blog) => (
-                <tr key={blog.idBlog} className="border-b hover:bg-gray-100  ">
-                  <td className="px-4 py-2 rounded-l-[34px]">{blog.idBlog}</td>
+              {orders.map((dat) => (
+                <tr key={dat.id} className="border-b hover:bg-gray-100  ">
+                  <td className="px-4 py-2 rounded-l-[34px]">{dat.id}</td>
                   <td
                     className="px-4 py-2 "
                     
-                  >{blog.tema}</td>
-                  <td className="px-4 py-2">{blog.categoria}</td>
-                  <td className="px-4 py-2 flex justify-center items-center">
-                    <Image
-                      isZoomed
-                      width={120}
-                      height={70}
-                      radius="none"
-                      src={blog.imagen}
-                      alt="Imagen de blog"
-                    />
-                  </td>
-                  <td>hola</td>
+                  >{dat.OrderNo}</td>
+                  <td className="px-4 py-2">{dat.createdAt}</td>
+                  <td className="px-4 py-2">{dat.Quantity}</td>
+                  <td className="px-4 py-2">{dat.FinalPrice}</td>
                   <td className="px-4 py-2 rounded-r-[34px]">
                     <div className="flex flex-row items-center justify-center gap-x-4">
                       <div className="">
