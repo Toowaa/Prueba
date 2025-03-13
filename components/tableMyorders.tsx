@@ -1,13 +1,5 @@
-import { image, Image } from "@heroui/react";
+import { Button, image, Image, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
 import { useEffect, useState } from "react";
-const bloge=[
-    {
-        idBlog: 1,
-        tema: "Blog 1",
-        categoria: "Tecnología",
-        imagen: "https://i.ibb.co/6m6q2sX/blog-1.png",
-    }
-]
 
 interface Order {
     id: number;
@@ -16,11 +8,16 @@ interface Order {
     FinalPrice: number;
     Quantity: number;
 }
- 
-
 
 export default function TableMyOrders() {
     const [orders, setOrders] = useState<Order[]>([]);
+    const [idToDelete, setIdToDelete] = useState<number | null>(null);
+    
+    const {
+        isOpen: isOpenDelete,
+        onOpen: onOpenDelete,
+        onOpenChange: onOpenChangeDelete,
+    } = useDisclosure();
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -37,7 +34,33 @@ export default function TableMyOrders() {
         fetchOrders();
     }, []); 
 
+    const openDeleteModal = (id: number) => {
+        setIdToDelete(id);
+        onOpenDelete();
+    };
+
+    const confirmDelete = async () => {
+        if (idToDelete === null) return;
+        
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/order/${idToDelete}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al eliminar la orden');
+            }
+            const result = await response.json();
+            console.log("Resultado de la orden eliminada:", result);
+            onOpenChangeDelete();
+            window.location.href = "/"; 
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
     return (
+        <>
         <div className="max-h-[500px] overflow-y-auto overflow-scroll:scrollbar-none">
           <table className="w-full border-separate border-spacing-y-4 ">
             <thead className="rounded-full">
@@ -51,14 +74,11 @@ export default function TableMyOrders() {
               </tr>
             </thead>
     
-            <tbody className="text-center   bg-white text-[#634AE2] font-normal text-[16px] leading-[20px]  ">
+            <tbody className="text-center bg-white text-[#634AE2] font-normal text-[16px] leading-[20px]">
               {orders.map((dat) => (
-                <tr key={dat.id} className="border-b hover:bg-gray-100  ">
+                <tr key={dat.id} className="border-b hover:bg-gray-100">
                   <td className="px-4 py-2 rounded-l-[34px]">{dat.id}</td>
-                  <td
-                    className="px-4 py-2 "
-                    
-                  >{dat.OrderNo}</td>
+                  <td className="px-4 py-2">{dat.OrderNo}</td>
                   <td className="px-4 py-2">{dat.createdAt}</td>
                   <td className="px-4 py-2">{dat.Quantity}</td>
                   <td className="px-4 py-2">{dat.FinalPrice}</td>
@@ -66,7 +86,7 @@ export default function TableMyOrders() {
                     <div className="flex flex-row items-center justify-center gap-x-4">
                       <div className="">
                         <button 
-                        //onClick={()=> handleEditarBlog(blog.idBlog)}
+                     
                         className="flex flex-col items-center justify-center hover:opacity-75"
                         >
                         <svg
@@ -83,8 +103,8 @@ export default function TableMyOrders() {
                       </div>
                       <div className="">
                         <button
-                          //onClick={()=> handleEliminarBlog(blog.idBlog)} 
-                          className="flex flex-col items-center justify-center hover:opacity-75"
+                            onClick={() => openDeleteModal(dat.id)}
+                            className="flex flex-col items-center justify-center hover:opacity-75"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -102,13 +122,37 @@ export default function TableMyOrders() {
                       </div>
                     </div>
                   </td>
-                  
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      );
 
-    
+        <Modal isOpen={isOpenDelete} onOpenChange={onOpenChangeDelete}>
+          <ModalContent>
+            <ModalBody className="p-8">
+              <h1 className="text-center text-lg font-bold text-gray-500">
+               ¿Are you sure?
+              </h1>
+              <div className="flex flex-row gap-x-4 items-center justify-center">
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => onOpenChangeDelete()}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  variant="light"
+                  onPress={confirmDelete}
+                >
+                Delete
+                </Button>
+              </div>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        </>
+    );
 }

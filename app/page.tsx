@@ -7,7 +7,6 @@ import Link from "next/link";
 import React from "react";
 
 export default function Home() {
-  const [istext, setText] = React.useState(true);
   return (
     < div className=" max-w-7xl mx-auto h-screen text-black  justify-center items-center ">
      <h1 className="text-3xl text-center"> My Orders</h1>
