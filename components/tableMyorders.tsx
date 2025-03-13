@@ -1,4 +1,5 @@
 import { Button, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 interface Order {
@@ -12,7 +13,7 @@ interface Order {
 export default function TableMyOrders() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
-    
+      
     const {
         isOpen: isOpenDelete,
         onOpen: onOpenDelete,
@@ -59,6 +60,11 @@ export default function TableMyOrders() {
         }
     };
 
+
+
+    const handleEdit = (id: number) => {
+        window.location.href = `/orders/${id}/edit`;
+    };
     return (
         <>
         <div className="max-h-[500px] overflow-y-auto overflow-scroll:scrollbar-none">
@@ -86,7 +92,8 @@ export default function TableMyOrders() {
                     <div className="flex flex-row items-center justify-center gap-x-4">
                       <div className="">
                         <button 
-                     
+                          onClick={() =>  handleEdit(dat.id)}
+
                         className="flex flex-col items-center justify-center hover:opacity-75"
                         >
                         <svg

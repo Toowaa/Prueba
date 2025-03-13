@@ -46,7 +46,6 @@ export default function FormAdd() {
   useEffect(() => {
     fetch("http://localhost:8000/api/products")
       .then((res) => res.json())
-
       .then((data) => setProducts(data))
       .catch((error) => console.error("Error fetching products:", error));
   }, []);
