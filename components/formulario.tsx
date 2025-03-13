@@ -119,7 +119,7 @@ export default function FormAdd() {
           ></Input>
         </Form>
         <div className="pt-8">
-          <Button className="rounded-full  bg-green-400" onPress={onOpen}>
+          <Button className="rounded-full bg-[#634AE2] text-whte text-base font-medium " onPress={onOpen}>
             Add New Product
           </Button>
         </div>
