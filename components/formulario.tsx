@@ -44,7 +44,7 @@ export default function FormAdd() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/products")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}api/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((error) => console.error("Error fetching products:", error));

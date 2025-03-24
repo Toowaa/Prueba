@@ -22,7 +22,7 @@ export default function TableMyOrders() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/order");
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/orders`);	
                 if (!response.ok) throw new Error("Error en la respuesta del servidor");
                 const data = await response.json();
                 setOrders(data);
