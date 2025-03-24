@@ -1,15 +1,11 @@
+'use client';
+import { Order } from "@/interface";
 import { Button, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface Order {
-    id: number;
-    OrderNo: number;
-    createdAt: string;
-    FinalPrice: number;
-    Quantity: number;
-}
 
-export default function TableMyOrders() {
+export default function TableMyOrders({data}:{data:Order[]}) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
       
@@ -22,7 +18,7 @@ export default function TableMyOrders() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/orders`);	
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/order`);	
                 if (!response.ok) throw new Error("Error en la respuesta del servidor");
                 const data = await response.json();
                 setOrders(data);
@@ -80,11 +76,11 @@ export default function TableMyOrders() {
             </thead>
     
             <tbody className="text-center bg-white text-[#634AE2] font-normal text-[16px] leading-[20px]">
-              {orders.map((dat) => (
+              {data.map((dat) => (
                 <tr key={dat.id} className="border-b hover:bg-gray-100">
                   <td className="px-4 py-2 rounded-l-[34px]">{dat.id}</td>
                   <td className="px-4 py-2">{dat.OrderNo}</td>
-                  <td className="px-4 py-2">{dat.createdAt}</td>
+                  <td className="px-4 py-2">{dat.createdAt.slice(0,10)}</td>
                   <td className="px-4 py-2">{dat.Quantity}</td>
                   <td className="px-4 py-2">{dat.FinalPrice}</td>
                   <td className="px-4 py-2 rounded-r-[34px]">
@@ -132,6 +128,18 @@ export default function TableMyOrders() {
               ))}
             </tbody>
           </table>
+          <div>
+          <div className="flex pt-4 justify-center md:justify-end">
+            <Link href={"Add-order"}>
+              <Button
+                radius="full"
+                className="text-white bg-[#634AE2] w-full max-w-32 font-normal text-sm"
+              >
+                New Order
+              </Button>
+            </Link>
+          </div>
+        </div>
         </div>
 
         <Modal isOpen={isOpenDelete} onOpenChange={onOpenChangeDelete}>

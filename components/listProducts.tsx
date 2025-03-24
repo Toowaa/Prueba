@@ -170,7 +170,9 @@ export default function Listar({
               </tr>
             ))}
           </tbody>
-          
+          <tfoot>
+            <tr>
+            <td>
             <Button
               onPress={handleSaveOrder}
               color="primary"
@@ -179,7 +181,9 @@ export default function Listar({
             >
               Save Order
             </Button>
-          
+            </td>
+            </tr>
+            </tfoot>
         </table>
         
       )}
