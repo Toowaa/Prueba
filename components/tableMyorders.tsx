@@ -2,11 +2,11 @@
 import { Order } from "@/interface";
 import { Button, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 
 
 export default function TableMyOrders({data}:{data:Order[]}) {
-    const [orders, setOrders] = useState<Order[]>([]);
+
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
       
     const {
@@ -15,20 +15,6 @@ export default function TableMyOrders({data}:{data:Order[]}) {
         onOpenChange: onOpenChangeDelete,
     } = useDisclosure();
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/order`);	
-                if (!response.ok) throw new Error("Error en la respuesta del servidor");
-                const data = await response.json();
-                setOrders(data);
-            } catch (error) {
-                console.error("Error fetching orders:", error);
-            }
-        };
-
-        fetchOrders();
-    }, []); 
 
     const openDeleteModal = (id: number) => {
         setIdToDelete(id);

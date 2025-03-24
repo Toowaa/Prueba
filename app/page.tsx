@@ -1,7 +1,4 @@
-
 import TableMyOrders from "@/components/tableMyorders";
-import { Button } from "@heroui/react";
-import Link from "next/link";
 import React from "react";
 import { GetOrders } from "./apiroutes";
 
