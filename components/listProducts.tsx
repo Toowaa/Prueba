@@ -1,3 +1,4 @@
+import { OrderItem } from "@/interface";
 import {
   Button,
   Form,
@@ -7,8 +8,8 @@ import {
   ModalContent,
   useDisclosure,
 } from "@heroui/react";
-import { OrderItem } from "./formulario";
-import {  useState } from "react";
+
+import { useState } from "react";
 
 export default function Listar({
   orderItems,
@@ -72,36 +73,36 @@ export default function Listar({
   };
 
   const handleSaveOrder = async () => {
- 
     const formattedData = {
-      products: orderItems.map(item => ({
+      products: orderItems.map((item) => ({
         productId: item.productId,
-        quantity: item.quantity
-      }))
+        quantity: item.quantity,
+      })),
     };
-    
+
     console.log("Datos formateados:", formattedData);
-    
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formattedData)
-      });
-      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}api/order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formattedData),
+        }
+      );
+
       if (!response.ok) {
-        throw new Error('Error al guardar la orden');
+        throw new Error("Error al guardar la orden");
       }
-      
+
       const result = await response.json();
       console.log("Resultado de la orden guardada:", result);
-    window.location.href = "/";
-      
+      window.location.href = "/";
     } catch (error) {
       console.error("Error:", error);
-   
     }
   };
   return (
@@ -172,20 +173,19 @@ export default function Listar({
           </tbody>
           <tfoot>
             <tr>
-            <td>
-            <Button
-              onPress={handleSaveOrder}
-              color="primary"
-              variant="light"
-             className="text-white rounded-full bg-purple-400 w-full max-w-32 font-normal text-sm"
-            >
-              Save Order
-            </Button>
-            </td>
+              <td>
+                <Button
+                  onPress={handleSaveOrder}
+                  color="primary"
+                  variant="light"
+                  className="text-white rounded-full bg-purple-400 w-full max-w-32 font-normal text-sm"
+                >
+                  Save Order
+                </Button>
+              </td>
             </tr>
-            </tfoot>
+          </tfoot>
         </table>
-        
       )}
 
       <Modal isOpen={isOpenDelete} onOpenChange={onOpenChangeDelete}>
@@ -222,9 +222,7 @@ export default function Listar({
               backgroundImage: `linear-gradient(to right,rgba(54,22,216, 0.64), rgba(120,99,227, 0.48))`,
             }}
           >
-            <h1 className="text-center text-lg font-bold  ">
-              Edit Product
-            </h1>
+            <h1 className="text-center text-lg font-bold  ">Edit Product</h1>
             <Form>
               <Input
                 isReadOnly
@@ -236,6 +234,8 @@ export default function Listar({
                 isRequired
                 type="number"
                 label="Quantity"
+                min={1}
+      
                 labelPlacement="outside"
                 value={editingItem?.quantity.toString() || ""}
                 onChange={handleQuantityChange}
@@ -260,7 +260,7 @@ export default function Listar({
                 variant="light"
                 onPress={handleEditConfirm}
               >
-               Save
+                Save
               </Button>
             </div>
           </ModalBody>

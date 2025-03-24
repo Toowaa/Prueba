@@ -54,12 +54,10 @@ export default function EditOrderPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params.id as string;
-
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState<Order | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
-
   const {
     isOpen: isOpenDelete,
     onOpen: onOpenDelete,
@@ -81,20 +79,16 @@ export default function EditOrderPage() {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}api/order/${orderId}`
         );
-
         if (!response.ok) {
           throw new Error("Error al cargar la orden");
         }
-
         const apiData: ApiOrder = await response.json();
         console.log("Datos de la orden:", apiData);
-
         const productsResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}api/products`
         );
         const productsData: Product[] = await productsResponse.json();
         setProducts(productsData);
-
         const orderItems: OrderItem[] = apiData.products.map((prod) => {
           const productDetails = productsData.find(
             (p) => p.id === prod.productId
@@ -162,7 +156,7 @@ export default function EditOrderPage() {
         throw new Error("Error al actualizar la orden");
       }
 
-      router.push("/orders");
+      router.push("/");
     } catch (error) {
       console.error("Error updating order:", error);
     }
@@ -277,11 +271,12 @@ export default function EditOrderPage() {
               labelPlacement="outside"
               value={parseDate(order.date)}
               variant="bordered"
-              onChange={(date) => setOrder({ ...order, date: date ? date.toString() : null })}
+              onChange={(date) =>
+                setOrder({ ...order, date: date ? date.toString() : null })
+              }
               classNames={{
                 label: "!text-white font-bold",
                 timeInput: "!text-black",
-                
               }}
             />
           ) : (
@@ -289,7 +284,9 @@ export default function EditOrderPage() {
               label="Fecha"
               labelPlacement="outside"
               value={today(getLocalTimeZone())}
-              onChange={(date) => setOrder({ ...order, date: date ? date.toString() : null })}
+              onChange={(date) =>
+                setOrder({ ...order, date: date ? date.toString() : null })
+              }
               classNames={{
                 label: "text-[#634AE2] font-medium",
               }}
@@ -346,13 +343,11 @@ export default function EditOrderPage() {
                           }}
                           classNames={{
                             trigger: "!border-[#634AE2] text-[#634AE2]",
+                            listbox: "!text-black",
                           }}
                         >
                           {products.map((product) => (
-                            <SelectItem
-                              key={product.id.toString()}
-                             
-                            >
+                            <SelectItem key={product.id.toString()}>
                               {product.name}
                             </SelectItem>
                           ))}
@@ -414,7 +409,7 @@ export default function EditOrderPage() {
 
         <div className="bg-white p-6 rounded-lg shadow-sm mt-6 flex justify-between space-x-6 items-center">
           <div className="font-bold text-lg text-[#634AE2]">
-          Total Price: ${order.totalPrice.toFixed(2)}
+            Total Price: ${order.totalPrice.toFixed(2)}
           </div>
 
           <div className="flex gap-3">

@@ -15,26 +15,14 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 
 import { useEffect, useState } from "react";
 import Listar from "./listProducts";
+import { OrderItem, Product } from "@/interface";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-}
-export interface OrderItem {
-    productId: number;
-    ProductName: string;  
-    quantity: number;
-    price: number;
-  }
-  
- const initialOrderItem: OrderItem = {
-    productId: 0,
-    quantity: 0,
-    ProductName: "",
-    price: 0,
-  };
+const initialOrderItem: OrderItem = {
+  productId: 0,
+  quantity: 0,
+  ProductName: "",
+  price: 0,
+};
 
 export default function FormAdd() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -50,30 +38,30 @@ export default function FormAdd() {
       .catch((error) => console.error("Error fetching products:", error));
   }, []);
 
- 
-
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProductId = parseInt(e.target.value);
-    
-    const selectedProduct = products.find(product => product.id === selectedProductId);
-    
+
+    const selectedProduct = products.find(
+      (product) => product.id === selectedProductId
+    );
+
     setCurrentItem({
       ...currentItem,
       productId: selectedProductId,
       ProductName: selectedProduct ? selectedProduct.name : "",
-      price: selectedProduct ? selectedProduct.price : 0  
+      price: selectedProduct ? selectedProduct.price : 0,
     });
   };
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentItem({
       ...currentItem,
-      quantity: Number(e.target.value)
+      quantity: Number(e.target.value),
     });
   };
 
   const handleAddItem = (e: React.FormEvent) => {
-    e.preventDefault(); 
-    
+    e.preventDefault();
+
     if (currentItem.productId === 0 || currentItem.quantity <= 0) {
       alert("Por favor selecciona un producto y una cantidad válida");
       return;
@@ -119,12 +107,15 @@ export default function FormAdd() {
           ></Input>
         </Form>
         <div className="pt-8">
-          <Button className="rounded-full bg-[#634AE2] text-whte text-base font-medium " onPress={onOpen}>
+          <Button
+            className="rounded-full bg-[#634AE2] text-whte text-base font-medium "
+            onPress={onOpen}
+          >
             Add New Product
           </Button>
         </div>
       </div>
-      <Listar orderItems={orderItems} setOrderItems={setOrderItems}/>
+      <Listar orderItems={orderItems} setOrderItems={setOrderItems} />
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
@@ -143,14 +134,9 @@ export default function FormAdd() {
                 }}
                 placeholder="Choose a Product"
                 onChange={handleProductChange}
-
               >
                 {products.map((product) => (
-                  <SelectItem key={product.id} 
-                  >
-                    {product.name}
-                  </SelectItem>
-                  
+                  <SelectItem key={product.id}>{product.name}</SelectItem>
                 ))}
               </Select>
               <Input
@@ -165,7 +151,11 @@ export default function FormAdd() {
                 }}
                 placeholder="Quantity"
                 onChange={handleQuantityChange}
-                value={currentItem.quantity > 0 ? currentItem.quantity.toString() : ""}
+                value={
+                  currentItem.quantity > 0
+                    ? currentItem.quantity.toString()
+                    : ""
+                }
               ></Input>
               <Button
                 className="text-white bg-[#634AE2] w-full max-w-32 font-normal text-sm"
