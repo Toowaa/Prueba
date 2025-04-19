@@ -1,3 +1,4 @@
+
 import { OrderItem } from "@/interface";
 import {
   Button,
@@ -126,7 +127,7 @@ export default function Listar({
                 <td className="px-4 py-2 rounded-l-[34px]">{dat.productId}</td>
                 <td className="px-4 py-2">{dat.ProductName}</td>
                 <td className="px-4 py-2">{dat.price}</td>
-                <td className="px-4 py-2">{dat.quantity}</td>
+                <td className="px-4 py-2">{dat.quantity.toString()}</td>
                 <td className="px-4 py-2">{dat.quantity * dat.price}</td>
                 <td className="px-4 py-2 rounded-r-[34px]">
                   <div className="flex flex-row items-center justify-center gap-x-4">
