@@ -1,4 +1,4 @@
-import { Order, OrderItem, ProducApi, Product } from "@/interface";
+import { Order,  ProducApi } from "@/interface";
 import {
   Button,
   DatePicker,
@@ -18,7 +18,7 @@ import Listar from "./newlist";
 export default function NewOrder({ data }: { data: Order | null }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [products, setProducts] = useState<ProducApi[]>([]);
-  const [orderItems, setOrderItems] = useState<Product[]>([]);
+
 
   const [currentProduct, setCurrentProduct] = useState({
     productId: 0,

@@ -1,4 +1,4 @@
-import { ProducApi, Product } from "@/interface";
+import { ProducApi } from "@/interface";
 import { Button, Form, Input, Modal, ModalBody, ModalContent, Select, SelectItem } from "@heroui/react";
 
 export default function ProductModal({
