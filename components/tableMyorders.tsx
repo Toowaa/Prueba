@@ -44,7 +44,7 @@ export default function TableMyOrders({data}:{data:Order[]}) {
 
 
     const handleEdit = (id: number) => {
-        window.location.href = `/orders/${id}/edit`;
+        window.location.href = `/Add-order?id=${id}`;
     };
     return (
         <>
