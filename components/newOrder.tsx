@@ -1,4 +1,4 @@
-import { Order, OrderItem, Product } from "@/interface";
+import { Order, OrderItem, ProducApi, Product } from "@/interface";
 import {
   Button,
   DatePicker,
@@ -13,29 +13,26 @@ import {
 } from "@heroui/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { useEffect, useState } from "react";
-// Listar component is imported but not used - consider removing this
 import Listar from "./newlist";
 
 export default function NewOrder({ data }: { data: Order | null }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProducApi[]>([]);
+  const [orderItems, setOrderItems] = useState<Product[]>([]);
 
-  // orderItems state is not being used in the component logic - can be removed
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-
-  // currentProduct state can be simplified since we only need productId and quantity
   const [currentProduct, setCurrentProduct] = useState({
     productId: 0,
     quantity: 0,
+    productDetails: null as ProducApi | null,
   });
 
-  const [currentItem, setCurrentItem] = useState({
-    id: null,
+  const [currentItem, setCurrentItem] = useState<Order>({
+    id: 0,
     OrderNo: "",
     createdAt: new Date().toISOString(),
     FinalPrice: 0,
     Quantity: 0,
-    products: [], // Initialize as empty array instead of with a default product
+    products: [],
   });
 
   useEffect(() => {
@@ -47,15 +44,14 @@ export default function NewOrder({ data }: { data: Order | null }) {
         const productsData = await productsResponse.json();
         setProducts(productsData);
 
-        // If we have data, initialize currentItem with it
-        if (data) {
+        if (data?.products) {
           setCurrentItem({
-            id: data.id,
-            OrderNo: data.OrderNo || "",
+            id: data?.id,
+            OrderNo: data.OrderNo.toString(),
             createdAt: data.createdAt,
             FinalPrice: data.FinalPrice,
             Quantity: data.Quantity,
-            products: data.products ? [...data.products] : [],
+            products: data.products,
           });
         }
       } catch (error) {
@@ -66,88 +62,75 @@ export default function NewOrder({ data }: { data: Order | null }) {
     fetchData();
   }, [data]);
 
-
-
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const quantity = Number(e.target.value);
-    setCurrentProduct((prev) => ({
-      ...prev,
-      quantity,
-    }));
+  const formatDateForDatePicker = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}`;
   };
 
-  // Main function to handle adding a product
   const handleAddItem = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const { productId, quantity } = currentProduct;
-
-    if (!productId || quantity < 1) {
-      console.error("Invalid product or quantity");
+    
+    if (currentProduct.productId === 0 || currentProduct.quantity <= 0) {
+      alert("Please select a product and specify a valid quantity");
       return;
     }
-
-    // Find the selected product to get its details
-    const selectedProduct = products.find((p) => p.id === productId);
-    if (!selectedProduct) {
-      console.error("Product not found");
-      return;
-    }
-
-    // Check if product already exists in the products array
+    
     const existingProductIndex = currentItem.products.findIndex(
-      (p) => p.productId === productId
+      (item) => item.productId === currentProduct.productId
     );
-
-    if (existingProductIndex !== -1) {
-      // Update quantity if product already exists
-      setCurrentItem((prev) => {
-        const updatedProducts = [...prev.products];
-        updatedProducts[existingProductIndex].quantity = quantity;
-
-        // Recalculate final price
-        const newFinalPrice = updatedProducts.reduce((total, item) => {
-          const product = products.find((p) => p.id === item.productId);
-          return total + (product ? product.price * item.quantity : 0);
-        }, 0);
-
-        return {
-          ...prev,
-          products: updatedProducts,
-          FinalPrice: newFinalPrice,
-        };
-      });
-    } else {
-      // Add new product if it doesn't exist
-      const newProduct = {
-        id: null,
-        orderId: null,
-        productId,
-        quantity,
-      };
-
-      setCurrentItem((prev) => {
-        const updatedProducts = [...prev.products, newProduct];
-
-        // Calculate new final price
-        const newFinalPrice = updatedProducts.reduce((total, item) => {
-          const product = products.find((p) => p.id === item.productId);
-          return total + (product ? product.price * item.quantity : 0);
-        }, 0);
-
-        return {
-          ...prev,
-          products: updatedProducts,
-          Quantity: updatedProducts.length,
-          FinalPrice: newFinalPrice,
-        };
-      });
+    
+    const productDetails = products.find((p) => p.id === currentProduct.productId);
+    if (!productDetails) {
+      alert("Selected product not found");
+      return;
     }
 
-    // Reset current product selection
-    setCurrentProduct({ productId: 0, quantity: 0 });
+    const updatedItem: Order = { ...currentItem };
+    
+    if (existingProductIndex >= 0) {
+      const updatedProducts = [...updatedItem.products];
+      updatedProducts[existingProductIndex] = {
+        ...updatedProducts[existingProductIndex],
+        quantity: updatedProducts[existingProductIndex].quantity + currentProduct.quantity
+      };
+      updatedItem.products = updatedProducts;
+    } else {
 
-    // Close modal
+      updatedItem.products = [
+        ...updatedItem.products,
+        {
+          id: 0, 
+          orderId: updatedItem.id,
+          productId: currentProduct.productId,
+          quantity: currentProduct.quantity
+        }
+      ];
+    }
+    
+
+    updatedItem.Quantity = updatedItem.products.reduce(
+      (sum, item) => sum + item.quantity, 
+      0
+    );
+    
+    updatedItem.FinalPrice = updatedItem.products.reduce((sum, item) => {
+      const productInfo = products.find((p) => p.id === item.productId);
+      return sum + (productInfo?.price || 0) * item.quantity;
+    }, 0);
+    
+    setCurrentItem(updatedItem);
+    
+
+    setCurrentProduct({
+      productId: 0,
+      quantity: 0,
+      productDetails: null
+    });
+    
+
     onOpenChange();
   };
 
@@ -159,7 +142,7 @@ export default function NewOrder({ data }: { data: Order | null }) {
             label="Order ID"
             isReadOnly
             placeholder="Order ID"
-            value={data?.id?.toString() || ""}
+            value={data?.id.toString()}
             labelPlacement="outside"
             classNames={{
               label: "!text-white font-bold",
@@ -170,7 +153,7 @@ export default function NewOrder({ data }: { data: Order | null }) {
             <DatePicker
               label="Date"
               labelPlacement="outside"
-              value={parseDate(data.createdAt)}
+              value={parseDate(formatDateForDatePicker(data.createdAt))}
               variant="bordered"
               classNames={{
                 label: "!text-white font-bold",
@@ -191,22 +174,16 @@ export default function NewOrder({ data }: { data: Order | null }) {
           <Input
             label="Total Products"
             isReadOnly
-            value={currentItem.Quantity.toString()}
+            value={data?.Quantity.toString()}
             labelPlacement="outside"
             placeholder="Nro Products"
-            classNames={{
-              label: "!text-white font-bold",
-            }}
           />
           <Input
             label="Final Price"
             isReadOnly
-            value={currentItem.FinalPrice.toString()}
+            value={data?.FinalPrice.toString()}
             labelPlacement="outside"
             placeholder="Final Price"
-            classNames={{
-              label: "!text-white font-bold",
-            }}
           />
         </Form>
         <div className="pt-8">
@@ -217,32 +194,13 @@ export default function NewOrder({ data }: { data: Order | null }) {
             Add New Product
           </Button>
         </div>
-
-        {/* You could add a products list display here to show what's been added */}
-        <div className="mt-4">
-          <h3 className="text-white font-bold mb-2">Products in Order:</h3>
-          {currentItem.products.length > 0 ? (
-            <ul className="space-y-2">
-              {currentItem.products.map((item, index) => {
-                const productInfo = products.find(
-                  (p) => p.id === item.productId
-                );
-                return (
-                  <li
-                    key={index}
-                    className="flex justify-between text-white bg-gray-800 p-2 rounded"
-                  >
-                    <span>{productInfo?.name || "Unknown"}</span>
-                    <span>Qty: {item.quantity}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className="text-white">No products added yet.</p>
-          )}
-        </div>
       </div>
+
+      <Listar
+        orderItems={currentItem.products}
+        setOrderItems={setCurrentItem}
+        product={products}
+      />
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
@@ -262,15 +220,23 @@ export default function NewOrder({ data }: { data: Order | null }) {
                 placeholder="Choose a Product"
                 onChange={(e) => {
                   const selectedId = parseInt(e.target.value);
+                  const selectedProduct = products.find(
+                    (p) => p.id === selectedId
+                  );
+                  
                   setCurrentProduct((prev) => ({
                     ...prev,
                     productId: selectedId,
+                    productDetails: selectedProduct || null
                   }));
+                  
+                  console.log("Seleccionaste:", selectedProduct?.id);
                 }}
               >
                 {products.map((product) => (
                   <SelectItem
                     key={product.id.toString()}
+                   
                     classNames={{
                       base: "!text-[#634AE2]",
                     }}
@@ -286,14 +252,22 @@ export default function NewOrder({ data }: { data: Order | null }) {
                 labelPlacement="outside"
                 isRequired
                 min="1"
-                max="100"
+                max={
+                  currentProduct.productDetails?.quantity?.toString() || "100"
+                }
                 classNames={{
                   label: "!text-[#634AE2]",
                   inputWrapper: "border-2 border-[#634AE2]",
                   input: "!text-[#634AE2]",
                 }}
                 placeholder="Quantity"
-                onChange={handleQuantityChange}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  setCurrentProduct((prev) => ({
+                    ...prev,
+                    quantity: value,
+                  }));
+                }}
                 value={
                   currentProduct.quantity > 0
                     ? currentProduct.quantity.toString()
