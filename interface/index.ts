@@ -20,5 +20,5 @@ export interface OrderItem {
   ProductName: string;
   quantity: number;
   price: number;
-  productDetails?: Product; // Añade esta línea
+  productDetails?: Product; 
 }

@@ -1,5 +1,6 @@
 "use client";
 import FormAdd from "@/components/formulario";
+import NewOrder from "@/components/newOrder";
 import { Order } from "@/interface";
 import { useSearchParams } from 'next/navigation';
 import { use, useEffect, useState } from "react";
@@ -38,7 +39,9 @@ export default function AddOrder() {
             backgroundImage: `linear-gradient(to right,rgba(120, 99, 227, 0.64), rgba(99, 74, 226, 0.48))`,
           }}
         >
-          <FormAdd data={order} />
+          {/*<FormAdd data={order} />
+*/}
+          <NewOrder data={order} />
         </div>
       </div>
     </div>
